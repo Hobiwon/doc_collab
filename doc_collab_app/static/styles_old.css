@@ -1,0 +1,169 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#left-panel, #right-panel {
+  height: 100vh;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+}
+
+#right-panel {
+  border-left: 1px solid #dee2e6;
+  position: relative;
+}
+
+#main-panel {
+  height: calc(100vh - 50px);
+  overflow-y: auto;
+  background-color: #fff;
+  position: relative;
+}
+
+#document-content {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.doc-frame {
+  width: 80%;
+  max-width: 900px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 2rem;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+#zoom-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.zoom-btn {
+  background: #0d6efd;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#tabs {
+  background-color: #e9ecef;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ced4da;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.tab {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border: 1px solid #adb5bd;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background-color: #dee2e6;
+  cursor: pointer;
+  color: #000;
+  position: relative;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab.active {
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: bold;
+  border-color: #0a58ca;
+}
+
+.tab.active:hover {
+  background-color: #0b5ed7;
+}
+
+.tab .close-btn {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #000;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.tab.active .close-btn {
+  color: white;
+}
+
+.comment {
+  background-color: #e2e6ea;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.comment-reply {
+  margin-left: 1rem;
+  background-color: #f1f3f5;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+#search-results {
+  position: absolute;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+}
+
+#search-results.showing {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#search-results button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0.25rem;
+}
+
+#new-comment-box {
+  display: none;
+  margin-top: 1rem;
+}
+
+#reply-label {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+#add-comment-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}

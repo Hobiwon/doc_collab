@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Workspace</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #left-panel, #right-panel {
+      height: 100vh;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+      border-right: 1px solid #dee2e6;
+    }
+    #right-panel {
+      border-left: 1px solid #dee2e6;
+    }
+    #main-panel {
+      height: calc(100vh - 50px);
+      overflow-y: auto;
+      background-color: #fff;
+    }
+    #tabs {
+      background-color: #e9ecef;
+      padding: 0.5rem;
+      border-bottom: 1px solid #ced4da;
+    }
+    .tab {
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      border: 1px solid #adb5bd;
+      border-radius: 0.25rem 0.25rem 0 0;
+      background-color: #dee2e6;
+      cursor: pointer;
+    }
+    .tab.active {
+      background-color: #ffffff;
+      border-bottom: none;
+      font-weight: 600;
+    }
+    .comment {
+      background-color: #e2e6ea;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .comment-reply {
+      margin-left: 1rem;
+      background-color: #f1f3f5;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      margin-top: 0.25rem;
+    }
+    #search-results button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div id="left-panel" class="col-2 p-3">
+        <h5>References</h5>
+        <ul id="references" class="list-unstyled"></ul>
+        <h5>Authors</h5>
+        <ul id="authors" class="list-unstyled"></ul>
+      </div>
+
+      <div class="col-8 p-0">
+        <div class="d-flex" id="tabs"></div>
+        <div id="main-panel" class="p-3">
+          <input id="search-box" class="form-control mb-3" placeholder="Search for a document...">
+          <div id="search-results" class="mb-3"></div>
+          <div id="document-content"></div>
+        </div>
+      </div>
+
+      <div id="right-panel" class="col-2 p-3">
+        <h5>Comments</h5>
+        <div id="comments"></div>
+        <textarea id="new-comment" class="form-control mt-2" rows="3" placeholder="Write a comment..."></textarea>
+        <button id="post-comment" class="btn btn-primary mt-2 w-100">Post Comment</button>
+        <button id="clear-workspace" class="btn btn-danger mt-4 w-100">Clear My Workspace</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let openTabs = {};
+    let activeDoc = null;
+
+    document.getElementById('search-box').addEventListener('input', async e => {
+      const res = await fetch(`/api/search?q=${e.target.value}`);
+      const results = await res.json();
+      const container = document.getElementById('search-results');
+      container.innerHTML = '';
+      results.forEach(doc => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-secondary';
+        btn.textContent = doc.title;
+        btn.onclick = () => openDocumentTab(doc.id, doc.title);
+        container.appendChild(btn);
+      });
+    });
+
+    async function openDocumentTab(id, title) {
+      if (openTabs[id]) setActiveTab(id);
+      else {
+        openTabs[id] = title;
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.textContent = title;
+        tab.onclick = () => setActiveTab(id);
+        tab.dataset.id = id;
+        document.getElementById('tabs').appendChild(tab);
+        setActiveTab(id);
+      }
+      const data = await fetch(`/api/document/${id}`).then(r => r.json());
+      activeDoc = id;
+      document.getElementById('document-content').innerHTML = `<h4>${title}</h4><p>${data.content}</p>`;
+      document.getElementById('authors').innerHTML = data.authors.map(a => `<li>${a}</li>`).join('');
+      document.getElementById('references').innerHTML = data.references.map(r => `<li><a href="#" onclick="openDocumentTab('${r.id}', '${r.title}')">${r.title}</a></li>`).join('');
+      renderComments(data.comments);
+    }
+
+    function setActiveTab(id) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.id === id);
+      });
+    }
+
+    function renderComments(comments) {
+      const container = document.getElementById('comments');
+      container.innerHTML = '';
+      const threads = comments.filter(c => !c.parent_id);
+      const replies = comments.filter(c => c.parent_id);
+      threads.forEach(thread => {
+        const div = document.createElement('div');
+        div.className = 'comment';
+        div.textContent = thread.text;
+        replies.filter(r => r.parent_id === thread.id).forEach(reply => {
+          const replyDiv = document.createElement('div');
+          replyDiv.className = 'comment-reply';
+          replyDiv.textContent = reply.text;
+          div.appendChild(replyDiv);
+        });
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById('post-comment').onclick = async () => {
+      const text = document.getElementById('new-comment').value;
+      if (!text || !activeDoc) return;
+      await fetch(`/api/document/${activeDoc}/comment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      openDocumentTab(activeDoc, openTabs[activeDoc]);
+      document.getElementById('new-comment').value = '';
+    };
+
+    document.getElementById('clear-workspace').onclick = () => {
+      openTabs = {};
+      activeDoc = null;
+      document.getElementById('tabs').innerHTML = '';
+      document.getElementById('document-content').innerHTML = '';
+      document.getElementById('authors').innerHTML = '';
+      document.getElementById('references').innerHTML = '';
+      document.getElementById('comments').innerHTML = '';
+      document.getElementById('search-box').value = '';
+      document.getElementById('search-results').innerHTML = '';
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Workspace</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div id="left-panel" class="col-2 p-0">
+        <div class="panel-header" onclick="toggleAccordion('left-panel')">
+          <span>References</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="p-3">
+          <ul id="references" class="list-unstyled"></ul>
+          <h5>Authors</h5>
+          <ul id="authors" class="list-unstyled"></ul>
+        </div>
+      </div>
+
+      <div class="col-8 p-0">
+        <div id="search-wrapper" class="p-3 border-bottom position-relative">
+          <input id="search-box" class="form-control mb-2" placeholder="Search for a document...">
+          <div id="search-results" class="dropdown-menu w-100"></div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center px-2 border-bottom" id="tab-bar">
+          <div id="tabs" class="flex-grow-1 d-flex"></div>
+          <!-- <div id="zoom-controls">
+            <button class="zoom-btn" onclick="adjustZoom('out')">-</button>
+            <span id="zoom-label" style="color:#333; font-weight: 500; min-width: 50px; text-align: center;">100%</span>
+            <button class="zoom-btn" onclick="adjustZoom('reset')">100%</button>
+            <button class="zoom-btn" onclick="adjustZoom('in')">+</button>
+          </div> -->
+          <button id="clear-workspace" class="btn btn-sm btn-outline-danger ms-2" title="Clear My Workspace">
+            🗑️
+          </button>
+        </div>
+        <div id="main-panel" class="p-3">
+          <div id="zoom-controls">
+            <button class="zoom-btn" onclick="adjustZoom('out')">-</button>
+            <span id="zoom-label" style="color:#333; font-weight: 500; min-width: 50px; text-align: center;">100%</span>
+            <button class="zoom-btn" onclick="adjustZoom('reset')">100%</button>
+            <button class="zoom-btn" onclick="adjustZoom('in')">+</button>
+          </div>
+          <div id="document-content"></div>
+        </div>
+      </div>
+
+      <div id="right-panel" class="col-2 p-3">
+        <div class="panel-header" onclick="toggleAccordion('right-panel')">
+          Comments <span class="chevron">▾</span>
+        </div>
+
+        <div id="comments"></div>
+
+        <div id="new-comment-box" class="collapse-box">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <div id="reply-label"></div>
+            <button id="dismiss-reply" class="btn btn-sm btn-outline-secondary">&times;</button>
+          </div>
+          <textarea id="new-comment" class="form-control mt-1" rows="3" placeholder="Write a comment..."></textarea>
+          <button id="post-comment" class="btn btn-primary mt-2 w-100">Post Comment</button>
+          <button id="cancel-comment" class="btn btn-secondary mt-2 w-100">Cancel</button>
+        </div>
+
+        <button id="add-comment-btn" class="btn" title="Add a new comment">+</button>
+      </div>
+    </div>
+  </div>
+  <!-- <script type="module">
+    import { toggleAccordion } from '/static/js/layout.js';
+    window.toggleAccordion = toggleAccordion;
+  </script> -->
+  <script type="module" src="/static/js/init.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+Flask
+flask-cors
+cx_Oracle
+gunicorn
